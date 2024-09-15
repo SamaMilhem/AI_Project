@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Mastermind Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: rgba(195, 178, 144, 0.86);
+            overflow: hidden;
+        }
+        .game-container {
+            background-color: rgba(64, 55, 46, 0.86);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            max-width: 100%;
+            width: 400px;
+            box-sizing: border-box;
+            position: relative;
+            scale: 0.7;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-top: 0;
+            font-family: Broadway;
+        }
+        .board-container {
+            display: flex;
+            align-items: flex-start;
+        }
+        .arrow {
+            color: #ffffff;
+            font-size: 18px;
+            margin-right: 5px;
+            padding: 10px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .slot {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: rgba(195, 178, 144, 0.86);
+            border: 2px solid rgba(138, 125, 103, 0.86);
+            cursor: pointer;
+            padding: 3px;
+            margin-left: 5px;
+        }
+        .feedback {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            width: 30px;
+            margin-left: 10px;
+            padding: 2px;
+        }
+        .feedback-peg {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(195, 178, 144, 0.7);
+        }
+        .row {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 5px;
+            width: auto;
+            margin-left: 30px;
+        }
+        .color-options {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+        button {
+    display: block;
+    width: 50%;
+    padding: 10px;
+    margin: 10px auto;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: rgba(195, 178, 144, 0.86);
+    font-family: Century;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    color: #FFFFFF;
+    transition: background-color 0.3s, opacity 0.3s;
+}
+
+    button:disabled {
+        background-color: rgba(138, 125, 103, 0.86); /* A more muted color */
+        cursor: not-allowed;
+        opacity: 0.5; /* Make it more transparent */
+    }
+    .hidden {
+        display: none;
+    }
+    .modal-content {
+    background-color: rgba(64, 55, 46, 0.95);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    max-width: 300px;
+    margin: 100px auto;
+    text-align: center;
+    color: black;
+}
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+    /* Modal Styles */
+        #gameOverModal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Ensure it is above other content */
+            border-radius: 10px;
+        }
+
+        #gameOverModal .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%; /* Make the modal wider */
+            max-width: 600px; /* Limit maximum width to 600px */
+        }
+
+        #gameOverModal .modal-content h2 {
+            font-family: Broadway;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #gameOverModal .modal-content p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        #gameOverModal .modal-content .button-row {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #gameOverModal .modal-content button {
+            background-color: rgba(195, 178, 144, 0.86);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: 140px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="game-container" id="game-container">
+        <h1 style="margin-top: 20px">Mastermind</h1>
+        <div id="color-options" class="color-options" style="margin-top: 20px"></div>
+        <div id="game-board">
+            <div id="rows-container"></div>
+            <button onclick="submitGuess()" id="submit-guess">Submit Guess</button>
+            <button onclick="newGame()" id="new-game" class="hidden">New Game</button>
+        </div>
+    </div>
+    <!-- Game Over Modal (contained within the game-wrapper) -->
+    <div id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="gameOverTitle"></h2>
+            <p id="gameOverMessage"></p>
+            <p id="gameOverTime"></p>
+            <div class="button-row">
+                <button onclick="restartGame()">Play Again</button>
+                <button onclick="goToMenu()">Go to Menu</button> <!-- Go to Menu Button -->
+            </div>
+        </div>
+    </div>
+    <script>
+        let secretCode = [];
+        let currentGuess = [];
+        let currentRow = 0;
+        const maxRows = 10;
+        let colors = [];
+
+        function getUrlParameter(name) {
+            /**
+             * Get the value of a URL parameter by name
+             * @param name - The name of the parameter
+             * @returns the value of the parameter
+             */
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        function generateColors(count) {
+            /**
+             * Generate an array of colors
+             * @param count - The number of colors to generate
+             * @returns an array of colors
+             */
+            const baseColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta', 'lime'];
+            return baseColors.slice(0, count);
+        }
+
+        function createBoard() {
+            /**
+             * Create the game board
+             */
+            const rowsContainer = document.getElementById('rows-container');
+            rowsContainer.innerHTML = '';
+            for (let i = 0; i < maxRows; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+
+                const arrow = document.createElement('div');
+                arrow.className = 'arrow';
+                arrow.textContent = '►';
+                arrow.style.visibility = i === currentRow ? 'visible' : 'hidden';
+                row.appendChild(arrow);
+
+                const boardContainer = document.createElement('div');
+                boardContainer.className = 'board-container';
+
+                const board = document.createElement('div');
+                board.className = 'board';
+                for (let j = 0; j < 4; j++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot';
+                    slot.onclick = () => removeColor(i, j);
+                    board.appendChild(slot);
+                }
+
+                boardContainer.appendChild(board);
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                for (let j = 0; j < 4; j++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'feedback-peg';
+                    feedback.appendChild(peg);
+                }
+
+                boardContainer.appendChild(feedback);
+                row.appendChild(boardContainer);
+                rowsContainer.appendChild(row);
+            }
+        }
+
+        function updateColorOptions() {
+            /**
+             * Update the color options
+             */
+            const colorOptions = document.getElementById('color-options');
+            colorOptions.innerHTML = '';
+
+            colors.forEach(color => {
+                const colorOption = document.createElement('div');
+                colorOption.className = 'color-option';
+                colorOption.style.backgroundColor = color;
+                colorOption.onclick = () => selectColor(color);
+                colorOptions.appendChild(colorOption);
+            });
+        }
+
+        function checkGuess() {
+            /**
+             * Check the current guess against the secret code
+             * @returns an object with the number of correct positions and colors
+             */
+            let correctPositions = 0;
+            let correctColors = 0;
+            const codeCopy = [...secretCode];
+            const guessCopy = [...currentGuess];
+
+            for (let i = 0; i < 4; i++) {
+                if (guessCopy[i] === codeCopy[i]) {
+                    correctPositions++;
+                    codeCopy[i] = null;
+                    guessCopy[i] = null;
+                }
+            }
+
+            for (let i = 0; i < 4; i++) {
+                if (guessCopy[i] !== null) {
+                    const index = codeCopy.indexOf(guessCopy[i]);
+                    if (index !== -1) {
+                        correctColors++;
+                        codeCopy[index] = null;
+                    }
+                }
+            }
+
+            return { correctPositions, correctColors };
+        }
+
+        function displayFeedback({ correctPositions, correctColors }) {
+            /**
+             * Display the feedback for the current guess
+             * @param feedback - an object with the number of correct positions and colors
+             */
+            const feedbackPegs = document.querySelectorAll('.row')[currentRow].querySelectorAll('.feedback-peg');
+            for (let i = 0; i < correctPositions; i++) {
+                feedbackPegs[i].style.backgroundColor = 'black';
+            }
+            for (let i = correctPositions; i < correctPositions + correctColors; i++) {
+                feedbackPegs[i].style.backgroundColor = 'white';
+            }
+        }
+
+        function updateArrow() {
+            /**
+             * Update the arrow to indicate the current row
+             */
+            const arrows = document.querySelectorAll('.arrow');
+            arrows.forEach((arrow, index) => {
+                arrow.style.visibility = index === currentRow ? 'visible' : 'hidden';
+            });
+        }
+    ``
+         function selectColor(color) {
+        /**
+         * Select a color for the current guess
+         * @param color - The color to select
+         */
+        const emptySlotIndex = currentGuess.findIndex(slot => !slot);
+        if (emptySlotIndex !== -1) {
+            currentGuess[emptySlotIndex] = color;
+            updateBoard();
+            checkGuessCompletion();
+        }
+    }
+    function checkGuessCompletion() {
+    /**
+     * Check if the current guess is complete and enable/disable the Submit Guess button
+     */
+    const isGuessComplete = currentGuess.every(color => color);
+    const submitButton = document.getElementById('submit-guess');
+
+    submitButton.disabled = !isGuessComplete;
+}
+
+    function removeColor(row, col) {
+        /**
+         * Remove a color from the current guess
+         * @param row - The row index
+         * @param col - The column index
+         */
+        if (row === currentRow && currentGuess[col]) {
+            currentGuess[col] = null;
+            updateBoard();
+            checkGuessCompletion();
+        }
+    }
+
+      function updateBoard() {
+    /**
+     * Update the game board with the current guess
+     */
+    const slots = document.querySelectorAll('.row')[currentRow].querySelectorAll('.slot');
+    slots.forEach((slot, index) => {
+        slot.style.backgroundColor = currentGuess[index] || 'rgba(195, 178, 144, 0.86)';
+    });
+    checkGuessCompletion(); // Check if the guess is complete after updating the board
+    }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const submitButton = document.getElementById('submit-guess');
+    submitButton.disabled = true; // Disable the button initially
+    const colorCount = parseInt(getUrlParameter('colors')) || 6;
+    colors = generateColors(colorCount);
+    updateColorOptions();
+    newGame();
+});
+
+        function submitGuess() {
+            /**
+             * Submit the current guess and check for a win or loss
+             */
+            if (currentGuess.some(color => !color)) {
+                alert('Please complete your guess before submitting.');
+                return;
+            }
+
+            const feedback = checkGuess();
+            displayFeedback(feedback);
+
+            if (feedback.correctPositions === 4) {
+                displayGameResult(`You win! The code was: ${secretCode.join(', ')}.`, true);
+            } else if (currentRow === maxRows - 1) {
+                displayGameResult(`You lose! The code was: ${secretCode.join(', ')}.`,false);
+            } else {
+                currentRow++;
+                currentGuess = [null, null, null, null];
+                updateArrow();
+                updateBoard();
+            }
+        }
+
+
+        function newGame() {
+            /**
+             * Start a new game
+             */
+            secretCode = Array.from({length: 4}, () => colors[Math.floor(Math.random() * colors.length)]);
+            console.log("secretCode: ", secretCode);
+            currentRow = 0;
+            currentGuess = [null, null, null, null];
+            document.getElementById('submit-guess').classList.remove('hidden');
+            document.getElementById('new-game').classList.add('hidden');
+            createBoard();
+            updateArrow();
+            updateBoard();
+        }
+        function displayGameResult(resultMessage, won) {
+    /**
+     * Show the game result in a modal instead of an alert
+     * @param resultMessage - The message to display in the modal
+     * @param won - Boolean indicating if the player won
+     */
+    const modal = document.getElementById('gameOverModal');
+    const resultTitle = document.getElementById('gameOverTitle');
+    const resultMessageElem = document.getElementById('gameOverMessage');
+
+    if (won) {
+        resultTitle.textContent = 'Congratulations!';
+        resultMessageElem.textContent = `You won! The code was: ${secretCode.join(', ')}.`;
+    } else {
+        resultTitle.textContent = 'Game Over';
+        resultMessageElem.textContent = `You lost! The code was: ${secretCode.join(', ')}.`;
+    }
+
+       // Display the modal
+    modal.style.display = 'flex'; // Show the modal by setting the display to flex
+}
+
+function goToMenu() {
+            window.location.href = 'menu_page.html'; // Adjust this URL to your menu page
+        }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const submitButton = document.getElementById('submit-guess');
+    const modal = document.getElementById('gameResultModal');
+
+    // Ensure the modal is hidden on load
+    modal.classList.add('hidden');
+
+    submitButton.disabled = true; // Disable the button initially
+    const colorCount = parseInt(getUrlParameter('colors')) || 6;
+    colors = generateColors(colorCount);
+    updateColorOptions();
+    newGame(); // Initialize the first game on page load
+});
+
+     function restartGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+            newGame();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+    const submitButton = document.getElementById('submit-guess');
+    submitButton.disabled = true; // Disable the button initially
+    const colorCount = parseInt(getUrlParameter('colors')) || 6;
+    colors = generateColors(colorCount);
+    updateColorOptions();
+    newGame(); // Initialize the first game on page load
+
+    document.getElementById('gameOverModal').style.display = 'none';
+});
+
+    </script>
+</body>
+</html>

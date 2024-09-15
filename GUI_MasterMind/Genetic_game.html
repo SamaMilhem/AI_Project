@@ -1,0 +1,644 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(195, 178, 144, 0.86);
+            margin: 0;
+        }
+
+        .main-title {
+            font-family: Broadway;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .color-options {
+            display: flex;
+            justify-content: center;
+            margin: 10px -5px;
+        }
+
+        .boards-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .game-container {
+            position: relative;
+            background-color: rgba(64, 55, 46, 0.86);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            width: 450px;
+            box-sizing: border-box;
+        }
+
+        .game-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            text-align: right;
+            font-family: Century;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            scale: 0.8;
+        }
+
+        .icon {
+            font-size: 24px;
+        }
+
+        #score, #timer {
+            margin: 2px 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            font-family: Broadway;
+            margin-top: 0;
+        }
+
+        .board-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            scale: 1.2;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            width: 43%;
+        }
+
+        .slot {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: rgba(195, 178, 144, 0.86);
+            border: 2px solid rgba(138, 125, 103, 0.86);
+        }
+
+        .feedback {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            width: 30px;
+            margin-left: 10px;
+        }
+
+        .feedback-peg {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(195, 178, 144, 0.7);
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            margin: 0 5px;
+        }
+
+        button {
+            display: block;
+            width: 40%;
+            padding: 10px;
+            margin: 10px auto;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: rgba(195, 178, 144, 0.86);
+            font-family: Century;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            color: #FFFFFF;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .hint-button {
+            margin-top: 10px;
+        }
+         /* Modal Styles */
+        #gameOverModal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Ensure it is above other content */
+            border-radius: 10px;
+        }
+
+        #gameOverModal .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%; /* Make the modal wider */
+            max-width: 600px; /* Limit maximum width to 600px */
+        }
+
+        #gameOverModal .modal-content h2 {
+            font-family: Broadway;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #gameOverModal .modal-content p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        #gameOverModal .modal-content .button-row {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        #gameOverModal .modal-content button {
+            background-color: rgba(195, 178, 144, 0.86);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: 140px;
+        }
+    </style>
+    <title>Mastermind Game - User vs Agent</title>
+</head>
+<body>
+<div class="main-title" style="margin-bottom: -60px; margin-top: 70px ">Play Against AI</div>
+<div class="game-wrapper" style="scale: 0.78">
+    <div class="boards-container">
+        <div class="game-container">
+            <h1>Agent's Board<br>(Genetic Algorithm)</h1>
+            <div id="agent-game-board"></div>
+        </div>
+        <div class="game-container">
+            <h1>User's Board</h1>
+            <div class="game-info" style="margin-top: -5px">
+                <div id="timer">Time: 0s</div>
+                <div class="icon" style="margin-right: 10px">💰</div>
+                <div id="score" style="margin-right: 20px">0</div>
+            </div>
+            <div id="color-options" class="color-options" style="margin-top: 10px; margin-bottom: 10px"></div>
+            <div id="user-game-board"></div>
+            <button id="submit-guess" onclick="submitUserGuess()" disabled>Submit Guess</button>
+            <button id="hint-button" class="hint-button" onclick="getHint()">Get Hint (10 coins)</button>
+        </div>
+    </div>
+
+     <!-- Game Over Modal (contained within the game-wrapper) -->
+    <div id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="gameOverTitle"></h2>
+            <p id="gameOverMessage"></p>
+            <p id="gameOverTime"></p>
+            <div class="button-row">
+                <button onclick="restartGame()">Play Again</button>
+                <button onclick="goToMenu()">Go to Menu</button> <!-- Go to Menu Button -->
+            </div>
+        </div>
+    </div>
+<div id="notification" style="display:none; position:fixed; top:250px; left:50%; transform:translateX(-50%);
+background-color:#ff4d4d; color:white; padding:15px 20px; border-radius:10px; font-size:16px; z-index:101;">
+    Not enough coins! You need 10 coins to get a hint.
+</div>
+
+    <script>
+        let secretCode = [];
+        let userCurrentGuess = [null, null, null, null];
+        let userCurrentRow = 0;
+        let AgentCurrentRow = 0;
+        const maxRows = 10;
+        let colors;
+        let score = 0;
+        let timer;
+        let seconds = 0;
+        let previousGuesses = [];
+        let gameState = {
+            colors: [],
+            previousGuesses: []
+        };
+
+        // Genetic algorithm parameters
+        const DEFAULT_MAX_POP_SIZE = 150;
+        const DEFAULT_MAX_GENERATIONS = 100;
+        const DEFAULT_CROSSOVER_THEN_MUTATION_PROBABILITY = 0.03;
+        const DEFAULT_PERMUTATION_PROBABILITY = 0.03;
+        const DEFAULT_INVERSION_PROBABILITY = 0.02;
+        const DEFAULT_WHITE_PEGS_WEIGHT = 1;
+        const DEFAULT_BLACK_PEGS_WEIGHT = 1;
+        const DEFAULT_ELITE_RATIO = 0.4;
+        const DEFAULT_C0DE_LENGTH = 4;  // Length of the code (number of pegs)
+
+        initializeGame();
+
+        function calculateFitness(trial, previousGuesses, whitePegsWeight, blackPegsWeight) {
+            function getDifference(trial, guess) {
+                const guessResult = guess[1];
+                const guessCode = guess[0];
+                const trialResult = evaluateGuess(trial, guessCode);
+                return [Math.abs(trialResult[0] - guessResult[0]), Math.abs(trialResult[1] - guessResult[1])];
+            }
+
+            const differences = previousGuesses.map(guess => getDifference(trial, guess));
+            const sumBlackPinDifferences = differences.reduce((sum, dif) => sum + dif[0], 0);
+            const sumWhitePinDifferences = differences.reduce((sum, dif) => sum + dif[1], 0);
+            return blackPegsWeight * sumBlackPinDifferences + whitePegsWeight * sumWhitePinDifferences;
+        }
+
+        function crossover(code1, code2) {
+            if (Math.random() < 0.5) {
+                const point = Math.floor(Math.random() * (code1.length - 1)) + 1;
+                return [code1.slice(0, point).concat(code2.slice(point)), code2.slice(0, point).concat(code1.slice(point))];
+            } else {
+                const [point1, point2] = [...Array(code1.length).keys()].slice(1).sort(() => 0.5 - Math.random()).slice(0, 2).sort();
+                return [
+                    code1.slice(0, point1).concat(code2.slice(point1, point2)).concat(code1.slice(point2)),
+                    code2.slice(0, point1).concat(code1.slice(point1, point2)).concat(code2.slice(point2))
+                ];
+            }
+        }
+
+        function mutate(code, slots, colors) {
+            if (Math.random() < DEFAULT_CROSSOVER_THEN_MUTATION_PROBABILITY) {
+                const i = Math.floor(Math.random() * slots);
+                code[i] = Math.floor(Math.random() * colors);
+            }
+            return code;
+        }
+
+        function permute(code, slots) {
+            if (Math.random() < DEFAULT_PERMUTATION_PROBABILITY) {
+                const [pos1, pos2] = [...Array(slots).keys()].sort(() => 0.5 - Math.random()).slice(0, 2);
+                [code[pos1], code[pos2]] = [code[pos2], code[pos1]];
+            }
+            return code;
+        }
+
+        function invert(code, slots) {
+            if (Math.random() < DEFAULT_INVERSION_PROBABILITY) {
+                const [pos1, pos2] = [...Array(slots).keys()].sort(() => 0.5 - Math.random()).slice(0, 2).sort();
+                code = code.slice(0, pos1).concat(code.slice(pos1, pos2 + 1).reverse()).concat(code.slice(pos2 + 1));
+            }
+            return code;
+        }
+
+        function evolvePopulation(popsize, fitnessFunction, eliteratio, slots, colorCount) {
+            let population = Array.from({length: popsize}, () => Array.from({length: slots}, () => Math.floor(Math.random() * colorCount)));
+
+            for (let generation = 0; generation < DEFAULT_MAX_GENERATIONS; generation++) {
+                const fitnessScores = population.map(ind => [fitnessFunction(ind), ind]);
+                fitnessScores.sort((a, b) => a[0] - b[0]);
+
+                const numElite = Math.floor(eliteratio * popsize);
+                const elite = fitnessScores.slice(0, numElite).map(score => score[1]);
+
+                let newPopulation = [...elite];
+
+                while (newPopulation.length < popsize) {
+                    const [parent1, parent2] = elite.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+                    let [offspring1, offspring2] = crossover(parent1, parent2);
+                    offspring1 = mutate(permute(invert(offspring1, slots), slots), slots, colorCount);
+                    offspring2 = mutate(permute(invert(offspring2, slots), slots), slots, colorCount);
+
+                    newPopulation.push(offspring1, offspring2);
+                }
+
+                population = newPopulation.slice(0, popsize);
+
+                const eligibles = fitnessScores.filter(score => score[0] === 0).map(score => score[1]);
+                if (eligibles.length) {
+                    return eligibles;
+                }
+            }
+
+            return population.slice(0, popsize);
+        }
+
+        function numbersToColors(numbers) {
+            return numbers.map(num => gameState.colors[num]);
+        }
+
+        function generateColors(count) {
+            const baseColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta', 'lime'];
+            return baseColors.slice(0, count);
+        }
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        function generateSecretCode() {
+            return Array.from({length: 4}, () => Math.floor(Math.random() * colors.length));
+        }
+
+        function initializeGame() {
+            const colorCount = parseInt(getUrlParameter('colors')) || 6;
+            colors = generateColors(colorCount);
+            gameState.colors = colors;
+            secretCode = generateSecretCode();
+            console.log("secret code:", numbersToColors(secretCode));
+            userCurrentRow = 0;
+            AgentCurrentRow = 0;
+            userCurrentGuess = [null, null, null, null];
+            seconds = 0;
+            updateScoreDisplay();
+            previousGuesses = [];
+            gameState.previousGuesses = [];
+            startTimer();
+            createBoards();
+            updateColorOptions();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                seconds++;
+                document.getElementById('timer').textContent = `Time: ${seconds}s`;
+            }, 1000);
+        }
+
+        function createBoards() {
+            createBoard('user-game-board', maxRows);
+            createBoard('agent-game-board', maxRows);
+        }
+
+        function createBoard(boardId, rows) {
+            const board = document.getElementById(boardId);
+            board.innerHTML = '';
+            for (let i = 0; i < rows; i++) {
+                const row = document.createElement('div');
+                row.className = 'board-container';
+                const guessBoard = document.createElement('div');
+                guessBoard.className = 'board';
+                for (let j = 0; j < 4; j++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot';
+                    guessBoard.appendChild(slot);
+                }
+                row.appendChild(guessBoard);
+                if (boardId === 'user-game-board') {
+                    const feedbackBoard = document.createElement('div');
+                    feedbackBoard.className = 'feedback';
+                    for (let j = 0; j < 4; j++) {
+                        const peg = document.createElement('div');
+                        peg.className = 'feedback-peg';
+                        feedbackBoard.appendChild(peg);
+                    }
+                    row.appendChild(feedbackBoard);
+                }
+                board.appendChild(row);
+            }
+        }
+
+        function updateColorOptions() {
+            const colorOptions = document.getElementById('color-options');
+            colorOptions.innerHTML = '';
+            colors.forEach((color, index) => {
+                const colorOption = document.createElement('div');
+                colorOption.className = 'color-option';
+                colorOption.style.backgroundColor = color;
+                colorOption.onclick = () => selectColor(index);
+                colorOptions.appendChild(colorOption);
+            });
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('score').textContent = `${score}`;
+        }
+
+     function getHint() {
+    if (score >= 10) {
+        score -= 10;
+        updateScoreDisplay();
+        const emptySlotIndex = userCurrentGuess.findIndex(slot => slot === null);
+        if (emptySlotIndex !== -1) {
+            userCurrentGuess[emptySlotIndex] = secretCode[emptySlotIndex];
+            updateBoard('user-game-board', userCurrentRow, userCurrentGuess, 'user');
+        } else {
+            showNotification("Your current guess is already complete. Clear a slot to use the hint.");
+        }
+    } else {
+        showNotification("Not enough coins for a hint. You need 10 coins.");
+    }
+}
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.display = 'block';
+
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 1000);
+}
+
+        function selectColor(index) {
+            const emptySlotIndex = userCurrentGuess.findIndex(slot => slot === null);
+            if (emptySlotIndex !== -1) {
+                userCurrentGuess[emptySlotIndex] = index;
+            } else {
+                userCurrentGuess[3] = index;
+            }
+            updateBoard('user-game-board', userCurrentRow, userCurrentGuess, 'user');
+        }
+
+        function updateBoard(boardId, row, guess, type) {
+            const slots = document.querySelectorAll(`#${boardId} .board-container`)[row].querySelectorAll('.slot');
+            guess.forEach((colorIndex, i) => {
+                if (colorIndex !== null) {
+                    slots[i].style.backgroundColor = colors[colorIndex];
+                } else {
+                    slots[i].style.backgroundColor = 'rgba(195, 178, 144, 0.86)';
+                }
+                if (type === 'user') {
+                    slots[i].onclick = () => editGuess(i);
+                }
+            });
+
+            const submitButton = document.getElementById('submit-guess');
+            submitButton.disabled = guess.includes(null);
+        }
+
+        function editGuess(slotIndex) {
+            userCurrentGuess[slotIndex] = null;
+            updateBoard('user-game-board', userCurrentRow, userCurrentGuess, 'user');
+        }
+
+        function submitUserGuess() {
+            if (!userCurrentGuess.includes(null)) {
+                const feedback = evaluateGuess(userCurrentGuess, secretCode);
+                if (feedback[0] === 4) {
+                    endGame(true);
+                } else {
+                    updateBoard('user-game-board', userCurrentRow, userCurrentGuess, 'user');
+                    updateBoardFeedback('user-game-board', 'user', feedback, userCurrentRow);
+                    makeAgentGuess(gameState);
+
+                    userCurrentRow++;
+                    userCurrentGuess = [null, null, null, null];
+                    updateBoard('user-game-board', userCurrentRow, userCurrentGuess, 'user');
+                }
+            }
+        }
+
+        function arraysEqual(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            for (let i = 0; i < arr1.length; i++) {
+                if (arr1[i] !== arr2[i]) return false;
+            }
+            return true;
+        }
+
+        function makeAgentGuess(state) {
+            let code;
+            const fitnessFunction = trial => calculateFitness(trial, previousGuesses, DEFAULT_WHITE_PEGS_WEIGHT, DEFAULT_BLACK_PEGS_WEIGHT);
+
+            if (previousGuesses.length === 0) {
+                code = Array.from({length: DEFAULT_C0DE_LENGTH}, () => Math.floor(Math.random() * colors.length));
+            } else {
+                let eligibles = [];
+                for (let i = 0; i < DEFAULT_MAX_GENERATIONS; i++) {
+                    eligibles = evolvePopulation(DEFAULT_MAX_POP_SIZE, fitnessFunction, DEFAULT_ELITE_RATIO, DEFAULT_C0DE_LENGTH, colors.length);
+                    if (eligibles.length > 0 && fitnessFunction(eligibles[0]) === 0) break;
+                }
+
+                code = eligibles.length ? eligibles[0] : Array.from({length: DEFAULT_C0DE_LENGTH}, () => Math.floor(Math.random() * colors.length));
+
+                while (previousGuesses.some(([c, _]) => arraysEqual(c, code))) {
+                    code = Array.from({length: DEFAULT_C0DE_LENGTH}, () => Math.floor(Math.random() * colors.length));
+                }
+            }
+
+            const feedback = evaluateGuess(code, secretCode);
+            console.log("agent's guess", numbersToColors(code), feedback);
+            updateBoard('agent-game-board', AgentCurrentRow, code, 'agent');
+
+            if (feedback[0] === 4) {
+                setTimeout(() => endGame(false), 100);
+            } else {
+                AgentCurrentRow++;
+            }
+            previousGuesses.push([code, feedback]);
+        }
+
+        function updateBoardFeedback(boardId, type, [hits, misses], row) {
+            const feedbackSlots = document.querySelectorAll(`#${boardId} .board-container`)[row].querySelectorAll('.feedback-peg');
+            if (type === 'user') {
+                for (let i = 0; i < hits; i++) {
+                    feedbackSlots[i].style.backgroundColor = 'black';
+                }
+                for (let i = hits; i < hits + misses; i++) {
+                    feedbackSlots[i].style.backgroundColor = 'white';
+                }
+            }
+        }
+
+        function evaluateGuess(guess, secret) {
+            let blackPins = 0;
+            let whitePins = 0;
+            let secretCopy = [...secret];
+            let guessCopy = [...guess];
+
+            for (let i = 0; i < secret.length; i++) {
+                if (secret[i] === guess[i]) {
+                    blackPins++;
+                    secretCopy[i] = guessCopy[i] = null;
+                }
+            }
+
+            for (let i = 0; i < secret.length; i++) {
+                if (guessCopy[i] !== null) {
+                    const index = secretCopy.indexOf(guessCopy[i]);
+                    if (index !== -1) {
+                        whitePins++;
+                        secretCopy[index] = null;
+                    }
+                }
+            }
+
+            return [blackPins, whitePins];
+        }
+         // Function to go back to the menu
+        function goToMenu() {
+            window.location.href = 'menu_page.html'; // Adjust this URL to your menu page
+        }
+
+
+        function endGame(userWon) {
+            stopTimer();
+            const secretCodeColors = numbersToColors(secretCode);
+            const secretCodeMessage = `The secret code was: ${secretCodeColors.join(', ')}`;
+            const timeMessage = `Time taken: ${seconds} seconds`;
+
+            // Display the game over modal
+            document.getElementById('gameOverModal').style.display = 'flex';
+            document.getElementById('gameOverTitle').textContent = userWon ? 'Congratulations! You Won!' : 'Game Over! The Agent Wins!';
+            document.getElementById('gameOverMessage').textContent = secretCodeMessage;
+            document.getElementById('gameOverTime').textContent = timeMessage;
+
+            // Update score if the user won
+            if (userWon) {
+                score += 5;
+                updateScoreDisplay();
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+            initializeGame();
+        }
+    </script>
+</div>
+</body>
+</html>

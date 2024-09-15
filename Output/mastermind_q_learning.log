@@ -1,0 +1,13 @@
+2024-09-13 12:14:09,140 - INFO - Initializing Q-learning with parameters: Alpha = 0.3, Discount = 0.8, Epsilon = 0.4
+2024-09-13 12:36:49,627 - INFO - Colors: 6, Positions: 4, Avg Turns: 4.75, Time: 0.14, Training: 264.89 seconds
+2024-09-13 12:55:36,975 - INFO - Colors: 7, Positions: 4, Avg Turns: 5.08, Time: 0.22, Training: 486.26 seconds
+2024-09-13 13:04:12,576 - INFO - Colors: 8, Positions: 4, Avg Turns: 5.53, Time: 0.25, Training: 588.22 seconds
+2024-09-13 13:44:59,691 - INFO - Colors: 6, Positions: 5, Avg Turns: 5.13, Time: 0.39, Training: 1070.76 seconds
+2024-09-13 14:24:30,026 - INFO - Colors: 9, Positions: 4, Avg Turns: 5.89, Time: 0.51, Training: 1041.28 seconds
+2024-09-13 16:01:34,055 - INFO - Colors: 7, Positions: 5, Avg Turns: 5.48, Time: 1.35, Training: 2661.51 seconds
+2024-09-13 19:25:51,393 - INFO - Colors: 8, Positions: 5, Avg Turns: 5.83, Time: 2.48, Training: 5056.08 seconds
+2024-09-13 21:45:59,326 - INFO - Colors: 6, Positions: 6, Avg Turns: 5.49, Time: 3.83, Training: 6670.40 seconds
+2024-09-13 23:33:54,221 - INFO - Colors: 9, Positions: 5, Avg Turns: 6.27, Time: 3.63, Training: 7375.01 seconds
+2024-09-14 03:46:31,877 - INFO - Colors: 7, Positions: 6, Avg Turns: 5.92, Time: 5.63, Training: 10906.88 seconds
+2024-09-14 11:34:48,016 - INFO - Colors: 8, Positions: 6, Avg Turns: 6.38, Time: 6.95, Training: 16188.17 seconds
+2024-09-14 19:45:11,279 - INFO - Colors: 9, Positions: 6, Avg Turns: 6.62, Time: 8.44, Training: 21180.49 seconds

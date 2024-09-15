@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind Game - Menu</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: rgba(195, 178, 144, 0.86);
+        overflow: hidden;
+    }
+
+    .game-container {
+        background-color: rgba(64, 55, 46, 0.86);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        max-width: 100%;
+        transition: transform 0.5s ease-in-out;
+        width: 300px;
+        box-sizing: border-box;
+        scale: 1.3;
+    }
+
+    h1 {
+        text-align: center;
+        color: #ffffff;
+        margin-top: 0;
+        font-family: Broadway;
+    }
+
+    button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 16px;
+        font-family: Century;
+        font-weight: bold;
+        cursor: pointer;
+        background-color: rgba(195, 178, 144, 0.86);
+        border: none;
+        border-radius: 5px;
+        color: #ffffff;
+    }
+
+    .color-options {
+        margin-bottom: 20px;
+        color: #ffffff;
+        text-align: center;
+    }
+
+    .color-options input[type="range"] {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .color-options output {
+        display: block;
+        margin-top: 10px;
+        font-size: 18px;
+    }
+
+    .scale-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1px;
+        font-family: Georgia, serif; /* Change font to Georgia */
+        font-size: 14px;
+        color: #ffffff;
+    }
+
+    .scale-labels span {
+        /*margin-top: 1px;*/
+    }
+     .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+
+        }
+        .modal-content {
+            background-color: rgba(195, 178, 144, 0.86);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            margin-top: 1px;
+            text-align: center;
+        }
+        .close {
+            color: #000000;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+</style>
+</head>
+<body>
+    <div class="game-container" id="game-container">
+        <h1>Mastermind</h1>
+        <div id="mode-selection">
+            <div class="color-options">
+                <p style="font-size: 16px; font-family: Century; font-weight: bold;">Select Number of Colors:</p>
+                <input type="range" id="color-range" min="6" max="10" step="1" value="6" >
+                <div class="scale-labels">
+                    <span>6</span>
+                    <span>7</span>
+                    <span>8</span>
+                    <span>9</span>
+                    <span>10</span>
+                </div>
+            </div>
+            <button onclick="showInstructions()">Instructions</button>
+            <button onclick="startGame('manual.html')">The classic Game</button>
+            <button onclick="startGame('Genetic_game.html')">Play against Agent</button>
+
+        </div>
+    </div>
+     <div id="instructionsModal" class="modal">
+    <div class="modal-content" style="margin-top: 52px">
+        <span class="close" onclick="closeInstructions()">&times;</span>
+        <h2 style="text-align: center; font-weight: bold; font-family: Georgia">How to Play Mastermind</h2>
+        <div style="text-align: left; max-width: 400px; margin: 0 auto;font-weight: bold; font-family: Georgia">
+            <p>The computer will generate a secret code of 4 colors. Your goal is to guess the correct colors and their positions.</p>
+            <p>After each guess, you'll receive feedback:</p>
+            <ul>
+                <li style="font-weight: bolder">Black peg: </li> Correct color in the correct position
+                <li style="font-weight: bolder">White peg: </li>Correct color in the wrong position
+            </ul>
+            <p>Notice: You have only 10 attempts to guess the code. Therefore, use hints wisely!
+            psst... You will earn coins for each winning game against the agent.
+            <p>Challenge yourself with different difficulties by changing the number of optional colors!</p>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    function startGame(mode) {
+        /**
+         * Redirect to the game page with the selected number of colors
+         */
+        const colorCount = document.getElementById('color-range').value;
+        window.location.href = `${mode}?colors=${colorCount}`;
+    }
+       function showInstructions() {
+           /**
+            * Show the instructions modal
+            */
+            document.getElementById('instructionsModal').style.display = 'block';
+        }
+
+        function closeInstructions() {
+            /**
+             * Close the instructions modal
+             */
+            document.getElementById('instructionsModal').style.display = 'none';
+        }
+
+
+
+    // Close the modal when clicking outside of it
+    window.onclick = function (event) {
+        if (event.target === document.getElementById('instructionsModal')) {
+            closeInstructions();
+        }
+    }
+
+</script>
+</body>
+</html>
+
+

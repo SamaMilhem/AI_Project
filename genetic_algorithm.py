@@ -428,5 +428,9 @@ def different_weights(max_weight_range=3, min_weight_range=1, max_penalty_weight
 
 
 if __name__ == '__main__':
+    simulate_games(num_simulations=1000, colors=DEFAULT_COLORS,
+                   code_length=DEFAULT_C0DE_LENGTH, pop_size=DEFAULT_MAX_POP_SIZE,
+                   white_pegs_weight=DEFAULT_WHITE_PEGS_WEIGHT, black_pegs_weight=DEFAULT_BLACK_PEGS_WEIGHT,
+                   initial_guess=DEFAULT_INITIAL_GUESS, elite_ratio=DEFAULT_ELITE_RATIO)
     colors_vs_positions(color_range_min=6, color_range_max=14, code_length_min=4, code_length_max=8, num_games=100)
     different_weights()

@@ -315,7 +315,7 @@ def simulate_games(epsilon, num_games, alpha, discount, max_guesses, code_length
 
     total_training_time = time.time() - total_training_time
 
-    # print(f'Total training time, colors size: {num_colors} code length: {code_length}', total_training_time)
+    print(f'Total training time, colors size: {num_colors} code length: {code_length}', total_training_time)
 
     # Variables to track total successful games, guesses, and time
     total_guesses = 0
@@ -330,7 +330,6 @@ def simulate_games(epsilon, num_games, alpha, discount, max_guesses, code_length
 
         # If the game fails (more than 50 guesses), skip and restart the game
         if guesses == 50:
-            # print("Game Failed - restart game and timer")
             continue  # Do not count this game and retry
 
         # If successful, calculate the time for the game and accumulate the results
@@ -342,8 +341,8 @@ def simulate_games(epsilon, num_games, alpha, discount, max_guesses, code_length
         successful_games += 1
 
         # Display game details
-        # print(f'Game {successful_games}: Secret = {Environment._number_from_index(secret, num_colors, code_length)}, '
-        #       f'Guesses = {guesses}, Time: {elapsed_time:.2f} seconds')
+        print(f'Game {successful_games}: Secret = {Environment._number_from_index(secret, num_colors, code_length)}, '
+              f'Guesses = {guesses}, Time: {elapsed_time:.2f} seconds')
 
     # Calculate the averages for guesses and time, excluding failed games
     average_guesses = total_guesses / num_games
@@ -352,9 +351,9 @@ def simulate_games(epsilon, num_games, alpha, discount, max_guesses, code_length
     average_game_time = total_game_time / num_games
 
     # Display final results
-    # print(f"\nSimulated {num_games} successful games.")
-    # print(f"Average number of guesses per game: {average_guesses:.2f}")
-    # print(f"Average time per game (including training): {average_game_time:.2f} seconds")
+    print(f"\nSimulated {num_games} successful games.")
+    print(f"Average number of guesses per game: {average_guesses:.2f}")
+    print(f"Average time per game: {average_game_time:.2f} seconds")
 
     return average_guesses, average_game_time, total_training_time
 
@@ -430,7 +429,7 @@ def colors_vs_positions_multithreaded(num_of_games, min_range_color, max_range_c
 
     print("\nTime Taken (seconds) Table:")
     print(results_time)
-
+    generate_plots(log_file='Output/mastermind_q_learning.log')
     return results_time, results_turns
 
 
@@ -495,17 +494,18 @@ def generate_plots(log_file='Output/mastermind_q_learning.log'):
 
 if __name__ == '__main__':
 
-    # Simulate and evaluate the agent's performance over 1000 games - to get the 6,4 configuration performance
-    # avg_turns,_ =  simulate_games(epsilon=EPSILON, num_games=1000, alpha=ALPHA, discount=DISCOUNT,
-    #                                     max_guesses=MAX_GUESSES, code_length=CODE_LENGTH, num_colors=NUM_COLORS)
-    # # hyperparameters tuning
-    # hyperparameter_df, best_combination = generate_hyperparameter_table(code_length=4, num_colors=6,
-    # num_of_games=1000)
+# Simulate and evaluate the agent's performance over 1000 games - to get the 6,4 configuration performance
+    simulate_games(epsilon=EPSILON, num_games=1000, alpha=ALPHA, discount=DISCOUNT,
+                    max_guesses=MAX_GUESSES, code_length=genetic_algorithm.DEFAULT_C0DE_LENGTH, num_colors=genetic_algorithm.DEFAULT_NUM_COLORS)
+# hyperparameters tuning
+    hyperparameter_df, best_combination = generate_hyperparameter_table( code_length=
+                 genetic_algorithm.DEFAULT_C0DE_LENGTH, num_colors=genetic_algorithm.DEFAULT_NUM_COLORS,
+                 num_of_games=1000)
 
-    # get colors v.s. positions graphs
-    # # results_time, results_turns = colors_vs_positions_multithreaded(num_of_games=50, min_range_color=6,
-    #                                                                 max_range_color=9, min_range_position=4,
-    #                                                                 max_range_position=6)
-    generate_plots(log_file='Output/mastermind_q_learning.log')
+# get colors v.s. positions graphs
+    results_time, results_turns = colors_vs_positions_multithreaded(num_of_games=50, min_range_color=6,
+                                                                max_range_color=9, min_range_position=4,
+                                                                max_range_position=6)
+
 
 

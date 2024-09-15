@@ -134,7 +134,9 @@
             </div>
             <button onclick="showInstructions()">Instructions</button>
             <button onclick="startGame('manual.html')">The classic Game</button>
-            <button onclick="startGame('Genetic_game.html')">Play against Agent</button>
+            <button onclick="startGame('RLagent.html')">Q-Learning Agent</button>
+            <button onclick="startGame('Genetic_game.html')">Play Against a Genetic Agent</button>
+
 
         </div>
     </div>
@@ -142,19 +144,26 @@
     <div class="modal-content" style="margin-top: 52px">
         <span class="close" onclick="closeInstructions()">&times;</span>
         <h2 style="text-align: center; font-weight: bold; font-family: Georgia">How to Play Mastermind</h2>
-        <div style="text-align: left; max-width: 400px; margin: 0 auto;font-weight: bold; font-family: Georgia">
+        <div style="text-align: left; max-width: 400px; margin: 0 auto; font-weight: bold; font-family: Georgia">
             <p>The computer will generate a secret code of 4 colors. Your goal is to guess the correct colors and their positions.</p>
             <p>After each guess, you'll receive feedback:</p>
             <ul>
-                <li style="font-weight: bolder">Black peg: </li> Correct color in the correct position
-                <li style="font-weight: bolder">White peg: </li>Correct color in the wrong position
+                <li style="font-weight: bolder">Black peg: </li> Correct color in the correct position</li>
+                <li style="font-weight: bolder">White peg: </li> Correct color in the wrong position</li>
             </ul>
-            <p>Notice: You have only 10 attempts to guess the code. Therefore, use hints wisely!
-            psst... You will earn coins for each winning game against the agent.
-            <p>Challenge yourself with different difficulties by changing the number of optional colors!</p>
+            <p>Notice: You have only 10 attempts to guess the code, so use hints wisely!</p>
+            <p><strong>Game Modes:</strong></p>
+            <ul>
+                <li><strong>The Classic Game:</strong> You can choose to play alone, where you try to guess the computer's secret code.</li>
+                <li><strong>Play Against a Genetic Agent:</strong> Challenge the computer, which uses a Genetic Algorithm to guess the secret code. Try to outsmart it!</li>
+                <li><strong>Q-Learning Agent:</strong> You can see a run of a Q-Learning agent on a secret code that you select. Watch how the agent learns to guess your code.</li>
+            </ul>
+            <p>Psst... You will earn coins for each winning game against the genetic agent.
+                Challenge yourself with different difficulties by changing the number of optional colors when playing the classic game or against the genetic agent !</p>
         </div>
     </div>
 </div>
+
 
 
 

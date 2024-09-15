@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind Game - Q-Learning Agent</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(195, 178, 144, 0.86);
+        }
+
+        .game-container {
+            background-color: rgba(64, 55, 46, 0.86);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            scale: 0.65;
+            box-sizing: border-box;
+            margin-top: -15px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #fbfbfb;
+            margin-top: 0;
+            font-family: Broadway;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .board-container {
+            margin-top: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .slot {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: rgba(195, 178, 144, 0.86);
+            border: 2px solid rgba(138, 125, 103, 0.86);
+            cursor: pointer;
+            padding: 3px;
+            margin-left: 5px;
+        }
+
+        .feedback {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            width: 30px;
+            margin-left: 20px;
+            padding: 2px;
+        }
+
+        .feedback-peg {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(195, 178, 144, 0.7);
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            width: auto;
+            margin-left: 65px;
+        }
+
+        .color-options {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .color-option.selected {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+        }
+
+        button {
+            display: block;
+            width: 50%;
+            padding: 10px;
+            margin-left: 85px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: rgba(195, 178, 144, 0.86);
+            font-family: Century;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            color: #FFFFFF;
+            justify-content: center;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #secret-code {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #secret-code .slot {
+            margin: 0 5px;
+        }
+        /* Modal Styles */
+#gameResultModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+    justify-content: center;
+    align-items: center;
+    z-index: 100; /* Ensure it appears on top */
+}
+
+#gameResultModal .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 400px; /* Set maximum width */
+    margin: 0 auto; /* Center the modal on the screen */
+}
+
+#gameResultModal .modal-content h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: black; /* Ensure the text color is black */
+}
+
+#gameResultModal .modal-content p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+#gameResultModal .modal-content .button-row {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 20px; /* Space between buttons */
+    padding: 10px 0; /* Add padding at the top and bottom */
+}
+
+#gameResultModal .modal-content button {
+    background-color: rgba(195, 178, 144, 0.86);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    width: 140px; /* Equal width for both buttons */
+    max-width: 140px; /* Ensure max width is fixed */
+    text-align: center;
+    margin: 0 10px; /* Add margin around the buttons */
+}
+
+#gameResultModal .modal-content button:hover {
+    background-color: rgba(138, 125, 103, 0.86);
+}
+.notification {
+    background-color: rgba(255, 0, 0, 0.8); /* Red background */
+    color: white; /* White text color */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px; /* Add space below the notification */
+    text-align: center;
+    width: 100%; /* Full width of the container */
+    box-sizing: border-box;
+}
+
+.notification p {
+    display: inline; /* Make the paragraph and button inline */
+    margin-right: 10px;
+}
+
+.notification button {
+    background-color: white;
+    color: red;
+    font-weight: bold;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.notification button:hover {
+    background-color: #fff;
+    color: #900;
+}
+
+
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <h1>Mastermind vs Q-Learning Agent</h1>
+    <h2>Set Your Secret Code</h2>
+
+    <!-- Red Notification Box -->
+    <div id="notification-box" style="display:none; text-align: center; background-color: #ff4d4d; padding: 10px;
+     color: white; font-weight: bold; border-radius: 10px; width: 80%; margin: 0 auto;">
+    <p id="notification-message"></p>
+</div>
+
+    <div id="secret-code"></div>
+    <div id="color-options" class="color-options"></div>
+    <div id="game-board"></div>
+    <button id="start-game">Start Game</button>
+    <button id="new-game" style="display: none;">New Game</button>
+</div>
+
+<div id="gameResultModal" class="hidden">
+    <div class="modal-content">
+        <h2 id="gameResultTitle" style="color: black;"></h2> <!-- Set the color to black -->
+        <p id="gameResultMessage"></p>
+        <div class="button-row">
+            <button onclick="restartGame()">Play Again</button>
+            <button onclick="goToMenu()">Go to Menu</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let colors = [];
+    let secretCode = new Array(4); // Array to hold the secret code
+    const maxRows = 10;
+    let currentRow = 0;
+    let gameActive = false;
+    let selectedColor = null;
+    let currentGuess;
+    // let state={secretCode,currentGuess};
+
+    // Q-Learning Agent
+    class QLearningAgent {
+        constructor(epsilon, alpha, discount) {
+            this.epsilon = epsilon;  // Exploration rate
+            this.alpha = alpha;      // Learning rate
+            this.discount = discount; // Discount factor
+            this.Q_values = {};       // Q-values for state-action pairs
+            this.possibleStates = [];
+            this.state=null;
+        }
+
+        reset() {
+            this.possibleStates = this.generateAllPossibleStates();
+            // console.log("reset",this.possibleStates);
+            this.Q_values = {};  // Reset Q-values for a new game
+        }
+
+        // Generate all possible states
+        generateAllPossibleStates() {
+            let states = [];
+            for (let i = 0; i < Math.pow(colors.length, 4); i++) {
+                let state = i.toString(colors.length).padStart(4, '0');
+                states.push(state);
+            }
+            console.log(`Total states generated: ${states.length}`);
+
+            return states;
+        }
+
+        selectMove() {
+            if (Math.random() < this.epsilon) {
+                // Exploration: Choose a random move
+                return this.randomAction();
+            } else {
+                // Exploitation: Choose the best action based on Q-values
+                return this.getBestAction();
+            }
+        }
+
+        randomAction() {
+                console.log(`Length of possibleStates: ${this.possibleStates.length}`);
+
+             // Select a random state from the possible states array
+    const randomState = this.possibleStates[Math.floor(Math.random() * this.possibleStates.length)];
+
+    // Print the randomly selected state
+
+    // Return the random state
+    return randomState;
+        }
+
+        getBestAction() {
+            let bestValue = -Infinity;
+            let bestAction = this.randomAction();
+            for (let state of this.possibleStates) {
+                if (this.Q_values[state] !== undefined && this.Q_values[state] > bestValue) {
+                    bestValue = this.Q_values[state];
+                    bestAction = state;
+                }
+            }
+            return bestAction;
+        }
+        update(guess, reward) {
+    const bestNextValue = Math.max(...this.possibleStates.map(nextState => this.Q_values[nextState] || 0));
+    const tdTarget = reward + this.discount * bestNextValue;
+
+    // Initialize Q-value if it doesn't exist
+    if (this.Q_values[guess] === undefined) {
+        this.Q_values[guess] = 0;
+    }
+
+    // Update the Q-value using the Q-learning formula
+    this.Q_values[guess] += this.alpha * (tdTarget - this.Q_values[guess]);
+}
+
+        updatePossibleStates(guess, feedback) {
+            this.possibleStates = this.possibleStates.filter(state =>
+                this.calculateFeedback(guess, state).join(',') === feedback.join(',')
+            );
+        }
+
+        calculateFeedback(guess, code) {
+            let hits = 0;
+            let misses = 0;
+            let guessCount = Array(colors.length).fill(0);
+            let codeCount = Array(colors.length).fill(0);
+
+            for (let i = 0; i < 4; i++) {
+                if (guess[i] === code[i]) {
+                    hits++;
+                } else {
+                    guessCount[parseInt(guess[i])]++; // Count remaining unmatched pegs in guess
+                    codeCount[parseInt(code[i])]++; // Count remaining unmatched pegs in code
+                }
+            }
+
+            for (let i = 0; i < colors.length; i++) {
+                misses += Math.min(guessCount[i], codeCount[i]); // Calculate how many colors are correct but in the wrong place
+            }
+
+            return [hits, misses];
+        }
+        generateSecretCode() {
+    return Array.from({length: 4}, () => Math.floor(Math.random() * colors.length)).join('');
+}
+
+
+       train(n_episodes) {
+    for (let episode = 0; episode < n_episodes; episode++) {
+        // Generate a new secret code for each episode
+        this.possibleStates = this.generateAllPossibleStates();
+        const secret = this.generateSecretCode();
+
+        // Generate a new initial guess for each episode, ensuring it's different from the secret code
+        let currentGuess = this.randomAction();
+
+        let reward = 0;
+        let attempts = 0;  // Count the number of attempts in each episode
+
+        console.log(`\nEpisode ${episode + 1} - Secret code: ${secret}`);
+
+        while (reward !== 1) {  // Until the agent guesses correctly
+            attempts++;  // Increment attempt counter
+
+            // Get feedback based on the current guess and secret code
+            let feedback = this.calculateFeedback(currentGuess, secret);
+            reward = (feedback[0] === 4) ? 1 : -1;  // Reward is 1 for correct guess, -1 otherwise
+
+            // Print the current guess, feedback, and reward
+            console.log(`Attempt ${attempts}: Guess = ${currentGuess}, Feedback = [${feedback}], Reward = ${reward}`);
+
+            // Update the possible states and Q-values
+            this.updatePossibleStates(currentGuess, feedback);
+            this.update(currentGuess, reward);
+
+            // Select the next move (guess)
+            currentGuess = this.selectMove();
+        }
+
+        console.log(`Secret code guessed in ${attempts} attempts!\n`);
+    }
+}
+
+    }
+
+    const agent = new QLearningAgent(0.4, 0.3, 0.8);
+
+    function initializeGame() {
+        const colorCount = parseInt(new URLSearchParams(window.location.search).get('colors')) || 6;
+        colors = generateColors(colorCount);
+        createColorOptions();
+        createSecretCodeSlots();
+        createGameBoard();
+        agent.reset();
+        secretCode = new Array(4).fill(undefined);
+    }
+
+    function generateColors(count) {
+        const baseColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta', 'lime'];
+        return baseColors.slice(0, count);
+    }
+
+    function createColorOptions() {
+        const colorOptions = document.getElementById('color-options');
+        colors.forEach((color, index) => {
+            const colorOption = document.createElement('div');
+            colorOption.className = 'color-option';
+            colorOption.style.backgroundColor = color;
+            colorOption.onclick = () => selectColor(index);
+            colorOptions.appendChild(colorOption);
+        });
+    }
+
+    function createSecretCodeSlots() {
+        const secretCodeContainer = document.getElementById('secret-code');
+        secretCodeContainer.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'slot';
+            slot.onclick = () => editSecretCode(i);
+            secretCodeContainer.appendChild(slot);
+        }
+    }
+
+    function selectColor(index) {
+        if (gameActive) return;
+        selectedColor = colors[index];
+        document.querySelectorAll('.color-option').forEach(option => option.classList.remove('selected'));
+        document.querySelectorAll('.color-option')[index].classList.add('selected');
+
+        const emptySlotIndex = secretCode.findIndex(x => x === undefined);
+        if (emptySlotIndex !== -1) {
+            const slots = document.querySelectorAll('#secret-code .slot');
+            slots[emptySlotIndex].style.backgroundColor = selectedColor;
+            secretCode[emptySlotIndex] = colors.indexOf(selectedColor);
+        }
+    }
+
+    function editSecretCode(index) {
+        if (gameActive) return;
+        secretCode[index] = undefined;
+        const slots = document.querySelectorAll('#secret-code .slot');
+        slots[index].style.backgroundColor = 'rgba(195, 178, 144, 0.86)';
+    }
+
+    function selectSecretCodeSlot(index) {
+        if (gameActive || !selectedColor) return;
+        const slots = document.querySelectorAll('#secret-code .slot');
+        slots[index].style.backgroundColor = selectedColor;
+        secretCode[index] = colors.indexOf(selectedColor);
+        if (secretCode.filter(x => x !== undefined).length === 4) {
+            document.body.classList.remove('brush-cursor');
+        }
+    }
+
+    function createGameBoard() {
+        const gameBoard = document.getElementById('game-board');
+        gameBoard.innerHTML = '';
+        for (let i = 0; i < maxRows; i++) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            const board = document.createElement('div');
+            board.className = 'board';
+            for (let j = 0; j < 4; j++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                board.appendChild(slot);
+            }
+            row.appendChild(board);
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            for (let j = 0; j < 4; j++) {
+                const peg = document.createElement('div');
+                peg.className = 'feedback-peg';
+                feedback.appendChild(peg);
+            }
+            row.appendChild(feedback);
+            gameBoard.appendChild(row);
+        }
+    }
+
+ function startGame() {
+    const notificationBox = document.getElementById('notification-box');
+    const notificationMessage = document.getElementById('notification-message');
+    const gameContainer = document.querySelector('.game-container');
+
+    // Check if the secret code has been fully set (no undefined values)
+    if (secretCode.includes(undefined)) {
+        // Show the notification box with the message
+        notificationMessage.textContent = 'Please set a complete secret code before starting the game!';
+        notificationBox.style.display = 'block';  // Show the notification box
+
+        // Disable interaction by adding a class to the game container
+        gameContainer.classList.add('disabled-interaction');
+
+        // Set timeout to hide the message after 3 seconds and re-enable interaction
+        setTimeout(() => {
+            notificationBox.style.display = 'none';  // Hide the notification box
+            gameContainer.classList.remove('disabled-interaction');  // Re-enable interaction
+        }, 1000);
+
+        return;  // Stop the game from starting until the code is complete
+    }
+
+    // Hide the notification box if the code is complete
+    notificationBox.style.display = 'none';
+
+    // Rest of the game logic
+    gameActive = true;
+    document.getElementById('start-game').disabled = true; // Disable the start button but keep it visible
+    document.getElementById('new-game').style.display = 'none'; // Keep the new game button hidden initially
+    document.querySelector('h2').textContent = 'Training the agent...'; // Display training message
+
+    setTimeout(() => {
+        agent.train(2000);  // Train the agent for 2000 episodes
+        document.querySelector('h2').textContent = 'RL Agent is guessing...'; // Update message after training
+        agent.reset();
+        makeAgentGuess(); // Start the guessing process after training
+    }, 100);  // Add a small delay before starting the training
+}
+
+
+    function newGame() {
+        secretCode.fill(undefined);  // Reset the secret code
+        currentRow = 0;
+        gameActive = false;
+        selectedColor = null;
+        document.getElementById('start-game').disabled = false
+        document.getElementById('start-game').style.display = 'block';
+        document.getElementById('new-game').style.display = 'none';
+        document.querySelector('h2').textContent = 'Set Your Secret Code';
+        document.querySelectorAll('#secret-code .slot').forEach(slot => {
+            slot.style.backgroundColor = 'rgba(195, 178, 144, 0.86)';  // Reset slot colors
+        });
+        createGameBoard();
+    }
+
+    document.getElementById('start-game').addEventListener('click', startGame);
+    document.getElementById('new-game').addEventListener('click', newGame);
+
+    window.onload = initializeGame;
+
+    function makeAgentGuess() {
+        if (currentRow >= maxRows) {
+            endGame(false);
+            return;
+        }
+
+        const guess = agent.selectMove();
+        updateBoard(guess);
+
+        const feedback = checkGuess(guess);
+        displayFeedback(feedback);
+
+        if (feedback[0] === 4) {
+            endGame(true);
+        } else {
+            agent.updatePossibleStates(guess, feedback);
+            currentRow++;
+            setTimeout(makeAgentGuess, 1000);  // Delay for the next guess
+        }
+    }
+
+    function updateBoard(guess) {
+        const slots = document.querySelectorAll('.row')[currentRow].querySelectorAll('.slot');
+        for (let i = 0; i < 4; i++) {
+            slots[i].style.backgroundColor = colors[parseInt(guess[i])];
+        }
+    }
+
+    function checkGuess(guess) {
+        let hits = 0;
+        let misses = 0;
+        let secretCopy = [...secretCode];
+        let guessCopy = guess.split('').map(Number);
+
+        for (let i = 0; i < 4; i++) {
+            if (guessCopy[i] === secretCopy[i]) {
+                hits++;
+                secretCopy[i] = guessCopy[i] = null;
+            }
+        }
+
+        for (let i = 0; i < 4; i++) {
+            if (guessCopy[i] !== null) {
+                let index = secretCopy.indexOf(guessCopy[i]);
+                if (index !== -1) {
+                    misses++;
+                    secretCopy[index] = null;
+                }
+            }
+        }
+
+        return [hits, misses];
+    }
+
+    function displayFeedback([hits, misses]) {
+        const feedbackPegs = document.querySelectorAll('.row')[currentRow].querySelectorAll('.feedback-peg');
+        for (let i = 0; i < hits; i++) {
+            feedbackPegs[i].style.backgroundColor = 'black';
+        }
+        for (let i = hits; i < hits + misses; i++) {
+            feedbackPegs[i].style.backgroundColor = 'white';
+        }
+    }
+
+    function endGame(agentWon) {
+        gameActive = false;
+        setTimeout(() => {
+            if (agentWon) {
+                showGameResult(`The RL Agent guessed your code in ${currentRow + 1} attempts!`);
+            } else {
+                showGameResult('The RL Agent couldn\'t guess your code. You win!');
+            }
+        }, 500);
+    }
+
+
+function showGameResult(title) {
+    /**
+     * Display the game result in a modal
+     * @param title - The title of the message (e.g., "Congratulations!" or "Game Over!")
+     * @param message - The message explaining the result
+     */
+    document.getElementById('gameResultTitle').textContent = title;
+    document.getElementById('gameResultModal').style.display = 'flex';
+}
+
+function goToMenu() {
+    /**
+     * Go back to the menu (replace with actual menu navigation logic)
+     */
+    window.location.href = 'menu_page.html'; // Replace with the correct menu page URL
+}
+
+      function restartGame() {
+    document.getElementById('gameResultModal').style.display = 'none'; // Hide the result modal
+    newGame(); // Start a new game
+}
+function closeNotification() {
+    document.getElementById('notification-box').style.display = 'none';
+}
+
+
+</script>
+</body>
+</html>

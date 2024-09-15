@@ -2,6 +2,16 @@
 
 This repository contains a project to solve the Mastermind game using two AI approaches: **Q-Learning** and **Genetic Algorithm**. Additionally, the project includes an interactive **Mastermind GUI** implemented in HTML, allowing users to play the game against an AI agent or manually.
 
+## Mastermind Game Overview
+
+Mastermind is a classic code-breaking game where a player attempts to guess a secret code made up of colored pegs. After each guess, the player receives feedback:
+- **Black pegs** indicate correct colors in the correct positions.
+- **White pegs** indicate correct colors in the wrong positions.
+
+The goal is to guess the secret code within a limited number of attempts. In this project:
+- The **Q-Learning agent** learns through trial and error, exploring different solutions.
+- The **Genetic Algorithm** optimizes the solution by simulating natural selection, crossover, and mutation.
+
 ## Project Components
 
 1. **Q-Learning Algorithm**: A reinforcement learning agent that learns to solve the Mastermind game through exploration and exploitation.
@@ -81,13 +91,3 @@ From there, you can choose to:
 The `output/` directory contains:
 - **Plots**: Performance metrics such as learning curves and the number of guesses over time, generated during algorithm execution.
 - **CSV Files**: Includes data such as algorithm performance, hyperparameter configurations, and other metrics for analysis.
-
-### Mastermind Game Overview
-
-Mastermind is a classic code-breaking game where a player attempts to guess a secret code made up of colored pegs. After each guess, the player receives feedback:
-- **Black pegs** indicate correct colors in the correct positions.
-- **White pegs** indicate correct colors in the wrong positions.
-
-The goal is to guess the secret code within a limited number of attempts. In this project:
-- The **Q-Learning agent** learns through trial and error, exploring different solutions.
-- The **Genetic Algorithm** optimizes the solution by simulating natural selection, crossover, and mutation.

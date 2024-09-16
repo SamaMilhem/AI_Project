@@ -21,12 +21,6 @@ GUESSES_THRESHOLD = 50
 DEFAULT_BATCH_SIZE = 5
 random.seed(42)
 
-# # Setup logger
-# logging.basicConfig(filename='Output/mastermind_q_learning.log', level=logging.INFO,
-#                     format='%(asctime)s - %(levelname)s - %(message)s')
-#
-# logging.info("Initializing Q-learning with parameters: Alpha = %s, Discount = %s, "
-#              "Epsilon = %s", ALPHA, DISCOUNT, EPSILON)
 
 class Environment:
     """
@@ -277,12 +271,12 @@ def generate_hyperparameter_table(num_of_games, num_colors=genetic_algorithm.DEF
             num_colors=num_colors
         )
 
-        # Append the tuple (alpha, discount, epsilon, avg_guesses) to results
         results.append((alpha, discount, epsilon, avg_guesses))
 
     # Convert the results into a pandas DataFrame for easy display
     df = pd.DataFrame(results, columns=['Alpha', 'Discount', 'Epsilon', 'Avg Guesses'])
     df= df.sort_values(by="Avg Guesses").reset_index(drop=True)
+
     # Display the DataFrame
     print("\nTable of Hyperparameter Combinations and their Avg Guesses:")
     print(df)
@@ -292,7 +286,7 @@ def generate_hyperparameter_table(num_of_games, num_colors=genetic_algorithm.DEF
     print("\nCombination with the minimal average number of guesses:")
     print(min_row)
 
-    # Optionally, save the DataFrame to a CSV file if needed
+    # save the DataFrame to a CSV file
     df.to_csv('Output/hyperparameter_results.csv', index=False)
 
     return df, min_row
@@ -346,7 +340,6 @@ def simulate_games(epsilon, num_games, alpha, discount, max_guesses, code_length
     # Calculate the averages for guesses and time, excluding failed games
     average_guesses = total_guesses / num_games
 
-    # Include the total training time for the final output
     average_game_time = total_game_time / num_games
 
     # Display final results
@@ -391,6 +384,13 @@ def colors_vs_positions_multithreaded(num_of_games, min_range_color, max_range_c
     corresponds to the number of positions, and the values represent the average number of turns (guesses)
     for each configuration.
     """
+    # LOGGER - used for tracking the colors_vs_positions results
+    # Setup logger
+    # logging.basicConfig(filename='Output/mastermind_q_learning.log', level=logging.INFO,
+    #                     format='%(asctime)s - %(levelname)s - %(message)s')
+    #
+    # logging.info("Initializing Q-learning with parameters: Alpha = %s, Discount = %s, "
+    #              "Epsilon = %s", ALPHA, DISCOUNT, EPSILON)
 
     # Define ranges for colors and positions
     colors_range = list(range(min_range_color, max_range_color + 1))
@@ -462,7 +462,6 @@ def generate_plots(log_file='Output/mastermind_q_learning.log'):
         pivot_data = data.pivot('Colors', 'Positions', values)
         plt.figure(figsize=(8, 6))
 
-        # Annotate with both value and suffix (e.g., seconds)
         sns.heatmap(pivot_data, annot=True, fmt=".2f", cmap=cmap,
                     cbar_kws={'label': value_suffix})
 
@@ -474,17 +473,17 @@ def generate_plots(log_file='Output/mastermind_q_learning.log'):
         plt.show()
 
 
-    # Heatmap 1: Color vs Position, Avg Turns with 'viridis' color map
+    # Heatmap 1: Color vs Position, Avg Turns map
     generate_heatmap(df, 'Avg Turns', 'Average Turns per Code Configuration Heatmap\n The Q-Leaning '
                                       'Algorithm', 'Code Length', 'Colors',
                      to_save_path='Output/Average_Turns_Q_Learning',cmap='Greens')
 
-    # Heatmap 2: Color vs Position, Avg Time with 'coolwarm' color map
+    # Heatmap 2: Color vs Position, Avg Time map
     generate_heatmap(df, 'Avg Time', 'Average Time Heatmap per Code Configuration'
                                      ' Heatmap\n The Q-Leaning Algorithm', 'Code Length', 'Colors',
                      to_save_path='Output/Average_Time_Q_Learning', cmap='Blues', value_suffix='Seconds')
 
-    # Heatmap 3: Color vs Position, Training Time with 'magma' color map
+    # Heatmap 3: Color vs Position, Training Time map
     generate_heatmap(df, 'Training', 'Training Time per Code Configuration Heatmap\n The Q-Leaning Algorithm'
                      , 'Code Length', 'Colors',  to_save_path='Output/Average_Training_Q_Learning',
                      cmap='Reds', value_suffix='Seconds')

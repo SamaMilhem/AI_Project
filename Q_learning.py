@@ -241,7 +241,7 @@ def evaluate_agent(agent, secret, code_length, max_guesses, num_colors):
     guess = agent.get_best_action()
     env = Environment(secret, code_length, num_colors)
     num_guesses = 1
-
+    print(agent.Q_values)
     while guess != env.secret and num_guesses < GUESSES_THRESHOLD:
         feedback = env.get_feedback(guess)
         agent.restrict_possible_states(guess, feedback)
@@ -495,17 +495,17 @@ def generate_plots(log_file='Output/mastermind_q_learning.log'):
 if __name__ == '__main__':
 
 # Simulate and evaluate the agent's performance over 1000 games - to get the 6,4 configuration performance
-    simulate_games(epsilon=EPSILON, num_games=1000, alpha=ALPHA, discount=DISCOUNT,
+    simulate_games(epsilon=EPSILON, num_games=1, alpha=ALPHA, discount=DISCOUNT,
                     max_guesses=MAX_GUESSES, code_length=genetic_algorithm.DEFAULT_C0DE_LENGTH, num_colors=genetic_algorithm.DEFAULT_NUM_COLORS)
-# hyperparameters tuning
-    hyperparameter_df, best_combination = generate_hyperparameter_table( code_length=
-                 genetic_algorithm.DEFAULT_C0DE_LENGTH, num_colors=genetic_algorithm.DEFAULT_NUM_COLORS,
-                 num_of_games=1000)
-
-# get colors v.s. positions graphs
-    results_time, results_turns = colors_vs_positions_multithreaded(num_of_games=50, min_range_color=6,
-                                                                max_range_color=9, min_range_position=4,
-                                                                max_range_position=6)
-
-
-
+# # hyperparameters tuning
+#     hyperparameter_df, best_combination = generate_hyperparameter_table( code_length=
+#                  genetic_algorithm.DEFAULT_C0DE_LENGTH, num_colors=genetic_algorithm.DEFAULT_NUM_COLORS,
+#                  num_of_games=1000)
+#
+# # get colors v.s. positions graphs
+#     results_time, results_turns = colors_vs_positions_multithreaded(num_of_games=50, min_range_color=6,
+#                                                                 max_range_color=9, min_range_position=4,
+#                                                                 max_range_position=6)
+#
+#
+#

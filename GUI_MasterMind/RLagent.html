@@ -131,8 +131,7 @@
         #secret-code .slot {
             margin: 0 5px;
         }
-        /* Modal Styles */
-#gameResultModal {
+  #gameResultModal {
     display: none;
     position: fixed;
     top: 0;
@@ -153,7 +152,9 @@
     width: 80%;
     max-width: 400px; /* Set maximum width */
     margin: 0 auto; /* Center the modal on the screen */
+    position: relative; /* Make sure child elements like the close button are positioned relative to this */
 }
+
 
 #gameResultModal .modal-content h2 {
     font-size: 24px;
@@ -190,6 +191,19 @@
 #gameResultModal .modal-content button:hover {
     background-color: rgba(138, 125, 103, 0.86);
 }
+
+#gameResultModal .modal-content .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+#gameResultModal .modal-content .close-button:hover {
+    color: #000;
+}
 .notification {
     background-color: rgba(255, 0, 0, 0.8); /* Red background */
     color: white; /* White text color */
@@ -221,7 +235,6 @@
     color: #900;
 }
 
-
     </style>
 </head>
 <body>
@@ -244,7 +257,8 @@
 
 <div id="gameResultModal" class="hidden">
     <div class="modal-content">
-        <h2 id="gameResultTitle" style="color: black;"></h2> <!-- Set the color to black -->
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h2 id="gameResultTitle" style="color: black;"></h2>
         <p id="gameResultMessage"></p>
         <div class="button-row">
             <button onclick="restartGame()">Play Again</button>
@@ -278,7 +292,6 @@
         reset() {
             this.possibleStates = this.generateAllPossibleStates();
             // console.log("reset",this.possibleStates);
-            this.Q_values = {};  // Reset Q-values for a new game
         }
 
         // Generate all possible states
@@ -304,29 +317,27 @@
         }
 
         randomAction() {
-                console.log(`Length of possibleStates: ${this.possibleStates.length}`);
-
              // Select a random state from the possible states array
-    const randomState = this.possibleStates[Math.floor(Math.random() * this.possibleStates.length)];
-
-    // Print the randomly selected state
-
-    // Return the random state
-    return randomState;
+            // Return the random state
+            return this.possibleStates[Math.floor(Math.random() * this.possibleStates.length)];
         }
 
-        getBestAction() {
-            let bestValue = -Infinity;
-            let bestAction = this.randomAction();
-            for (let state of this.possibleStates) {
-                if (this.Q_values[state] !== undefined && this.Q_values[state] > bestValue) {
-                    bestValue = this.Q_values[state];
-                    bestAction = state;
-                }
-            }
-            return bestAction;
-        }
-        update(guess, reward) {
+       getBestAction() {
+    // Find the maximum Q-value among possible states, treating undefined/null as -Infinity
+    let maxValue = Math.max(...this.possibleStates.map(state => this.Q_values[state] != null ? this.Q_values[state] : -Infinity));
+
+    // Collect all states with the maximum Q-value
+    let bestActions = this.possibleStates.filter(state => this.Q_values[state] === maxValue);
+
+    // If no valid Q-value is found (i.e., maxValue is still -Infinity), choose a random action
+    if (maxValue === -Infinity || bestActions.length === 0) {
+        return this.randomAction();
+    }
+
+    // Randomly select one of the best actions
+    return bestActions[Math.floor(Math.random() * bestActions.length)];
+}
+update(guess, reward) {
     const bestNextValue = Math.max(...this.possibleStates.map(nextState => this.Q_values[nextState] || 0));
     const tdTarget = reward + this.discount * bestNextValue;
 
@@ -367,45 +378,47 @@
             return [hits, misses];
         }
         generateSecretCode() {
-    return Array.from({length: 4}, () => Math.floor(Math.random() * colors.length)).join('');
-}
+              return Array.from({length: 4}, () => Math.floor(Math.random() * colors.length)).join('');
+        }
 
 
        train(n_episodes) {
-    for (let episode = 0; episode < n_episodes; episode++) {
-        // Generate a new secret code for each episode
-        this.possibleStates = this.generateAllPossibleStates();
-        const secret = this.generateSecretCode();
+           for (let episode = 0; episode < n_episodes; episode++) {
+                // Generate a new secret code for each episode
+                this.possibleStates = this.generateAllPossibleStates();
+                const secret = this.generateSecretCode();
 
-        // Generate a new initial guess for each episode, ensuring it's different from the secret code
-        let currentGuess = this.randomAction();
+                // Generate a new initial guess for each episode, ensuring it's different from the secret code
+                let currentGuess = this.randomAction();
 
-        let reward = 0;
-        let attempts = 0;  // Count the number of attempts in each episode
+                let reward = 0;
+                let attempts = 0;  // Count the number of attempts in each episode
 
-        console.log(`\nEpisode ${episode + 1} - Secret code: ${secret}`);
+                console.log(`\nEpisode ${episode + 1} - Secret code: ${secret}`);
 
-        while (reward !== 1) {  // Until the agent guesses correctly
-            attempts++;  // Increment attempt counter
+                while (reward !== 1) {  // Until the agent guesses correctly
+                    attempts++;  // Increment attempt counter
+                    // console.log(`Length of possibleStates: ${this.possibleStates.length}`);
 
-            // Get feedback based on the current guess and secret code
-            let feedback = this.calculateFeedback(currentGuess, secret);
-            reward = (feedback[0] === 4) ? 1 : -1;  // Reward is 1 for correct guess, -1 otherwise
+                    // Get feedback based on the current guess and secret code
+                    let feedback = this.calculateFeedback(currentGuess, secret);
+                    reward = (feedback[0] === 4) ? 1 : -1;  // Reward is 1 for correct guess, -1 otherwise
 
-            // Print the current guess, feedback, and reward
-            console.log(`Attempt ${attempts}: Guess = ${currentGuess}, Feedback = [${feedback}], Reward = ${reward}`);
+                    // Print the current guess, feedback, and reward
+                    // console.log(`Attempt ${attempts}: Guess = ${currentGuess}, Feedback = [${feedback}], Reward = ${reward}`);
 
-            // Update the possible states and Q-values
-            this.updatePossibleStates(currentGuess, feedback);
-            this.update(currentGuess, reward);
+                    // Update the possible states and Q-values
+                    this.updatePossibleStates(currentGuess, feedback);
+                    this.update(currentGuess, reward);
 
-            // Select the next move (guess)
-            currentGuess = this.selectMove();
+                    // Select the next move (guess)
+                    currentGuess = this.selectMove();
+                }
+
+                // console.log(`Secret code guessed in ${attempts} attempts!\n`);
+            }
+           console.log(this.Q_values)
         }
-
-        console.log(`Secret code guessed in ${attempts} attempts!\n`);
-    }
-}
 
     }
 
@@ -469,16 +482,6 @@
         slots[index].style.backgroundColor = 'rgba(195, 178, 144, 0.86)';
     }
 
-    function selectSecretCodeSlot(index) {
-        if (gameActive || !selectedColor) return;
-        const slots = document.querySelectorAll('#secret-code .slot');
-        slots[index].style.backgroundColor = selectedColor;
-        secretCode[index] = colors.indexOf(selectedColor);
-        if (secretCode.filter(x => x !== undefined).length === 4) {
-            document.body.classList.remove('brush-cursor');
-        }
-    }
-
     function createGameBoard() {
         const gameBoard = document.getElementById('game-board');
         gameBoard.innerHTML = '';
@@ -538,7 +541,7 @@
     document.querySelector('h2').textContent = 'Training the agent...'; // Display training message
 
     setTimeout(() => {
-        agent.train(2000);  // Train the agent for 2000 episodes
+        agent.train(7000);  // Train the agent for 7000 episodes
         document.querySelector('h2').textContent = 'RL Agent is guessing...'; // Update message after training
         agent.reset();
         makeAgentGuess(); // Start the guessing process after training
@@ -572,7 +575,7 @@
             return;
         }
 
-        const guess = agent.selectMove();
+        const guess = agent.getBestAction();
         updateBoard(guess);
 
         const feedback = checkGuess(guess);
@@ -635,38 +638,42 @@
         setTimeout(() => {
             if (agentWon) {
                 showGameResult(`The RL Agent guessed your code in ${currentRow + 1} attempts!`);
+                document.getElementById('start-game').style.display = 'none';
+                document.getElementById('new-game').style.display = 'flex';
+
             } else {
                 showGameResult('The RL Agent couldn\'t guess your code. You win!');
+                document.getElementById('start-game').style.display = 'none';
+                document.getElementById('new-game').style.display = 'flex';
             }
         }, 500);
     }
 
 
-function showGameResult(title) {
-    /**
-     * Display the game result in a modal
-     * @param title - The title of the message (e.g., "Congratulations!" or "Game Over!")
-     * @param message - The message explaining the result
-     */
-    document.getElementById('gameResultTitle').textContent = title;
-    document.getElementById('gameResultModal').style.display = 'flex';
-}
+    function showGameResult(title) {
+        /**
+         * Display the game result in a modal
+         * @param title - The title of the message (e.g., "Congratulations!" or "Game Over!")
+         * @param message - The message explaining the result
+         */
+        document.getElementById('gameResultTitle').textContent = title;
+        document.getElementById('gameResultModal').style.display = 'flex';
+    }
 
-function goToMenu() {
-    /**
-     * Go back to the menu (replace with actual menu navigation logic)
-     */
-    window.location.href = 'menu_page.html'; // Replace with the correct menu page URL
-}
+    function goToMenu() {
+        /**
+         * Go back to the menu (replace with actual menu navigation logic)
+         */
+        window.location.href = 'menu_page.html'; // Replace with the correct menu page URL
+    }
 
       function restartGame() {
-    document.getElementById('gameResultModal').style.display = 'none'; // Hide the result modal
-    newGame(); // Start a new game
+        document.getElementById('gameResultModal').style.display = 'none'; // Hide the result modal
+        newGame(); // Start a new game
+      }
+      function closeModal() {
+    document.getElementById('gameResultModal').style.display = 'none';
 }
-function closeNotification() {
-    document.getElementById('notification-box').style.display = 'none';
-}
-
 
 </script>
 </body>

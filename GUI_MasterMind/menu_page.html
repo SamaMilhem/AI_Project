@@ -140,29 +140,44 @@
 
         </div>
     </div>
-     <div id="instructionsModal" class="modal">
-    <div class="modal-content" style="margin-top: 52px">
-        <span class="close" onclick="closeInstructions()">&times;</span>
-        <h2 style="text-align: center; font-weight: bold; font-family: Georgia">How to Play Mastermind</h2>
-        <div style="text-align: left; max-width: 400px; margin: 0 auto; font-weight: bold; font-family: Georgia">
+
+   <div id="instructionsModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; overflow: auto;" onclick="closeInstructions(event)">
+    <div class="modal-content" style="background-color: rgba(64, 55, 46, 0.86); border-radius: 10px; max-width: 600px; margin: 5% auto; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); position: relative;" onclick="event.stopPropagation();">
+        <span class="close" onclick="closeInstructions()" style="position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; color: #fff; cursor: pointer;">&times;</span>
+        <h2 style="text-align: center; font-weight: bold; font-family: 'Georgia', serif; margin-bottom: 20px; font-size: 26px; color: #fff;">How to Play Mastermind</h2>
+        <div style="text-align: left; max-width: 500px; margin: 0 auto; font-family: 'Georgia', serif; line-height: 1.6; font-size: 16px; color: #f1f1f1;">
             <p>The computer will generate a secret code of 4 colors. Your goal is to guess the correct colors and their positions.</p>
             <p>After each guess, you'll receive feedback:</p>
-            <ul>
-                <li style="font-weight: bolder">Black peg: </li> Correct color in the correct position</li>
-                <li style="font-weight: bolder">White peg: </li> Correct color in the wrong position</li>
+            <ul style="list-style: none; padding-left: 0; color: #f1f1f1;">
+                <li style="font-weight: bold; color: #fff;">⚫ Black peg:</li>
+                <li>Correct color in the correct position.</li>
+                <li style="font-weight: bold; color: #fff;">⚪ White peg:</li>
+                <li>Correct color in the wrong position.</li>
             </ul>
             <p>Notice: You have only 10 attempts to guess the code, so use hints wisely!</p>
             <p><strong>Game Modes:</strong></p>
-            <ul>
-                <li><strong>The Classic Game:</strong> You can choose to play alone, where you try to guess the computer's secret code.</li>
-                <li><strong>Play Against a Genetic Agent:</strong> Challenge the computer, which uses a Genetic Algorithm to guess the secret code. Try to outsmart it!</li>
-                <li><strong>Q-Learning Agent:</strong> You can see a run of a Q-Learning agent on a secret code that you select. Watch how the agent learns to guess your code.</li>
+            <ul style="list-style: none; padding-left: 0; color: #f1f1f1;">
+                <li style="margin-bottom: 10px;"><strong>The Classic Game:</strong> Play alone and try to guess the computer's secret code.</li>
+                <li style="margin-bottom: 10px;"><strong>Play Against a Genetic Agent:</strong> Challenge the computer using a Genetic Algorithm to guess the secret code. Try to outsmart it!</li>
+                <li style="margin-bottom: 10px;"><strong>Q-Learning Agent:</strong> Watch a Q-Learning agent guess your code and learn over time.</li>
             </ul>
-            <p>Psst... You will earn coins for each winning game against the genetic agent.
-                Challenge yourself with different difficulties by changing the number of optional colors when playing the classic game or against the genetic agent !</p>
+            <div style="border: 2px solid #fff; background-color: rgba(255, 255, 255, 0.2); padding: 15px; text-align: center; font-size: 16px; font-style: italic; font-weight: bold; border-radius: 8px; margin-top: 20px; color: #fff;">
+                Psst... You'll earn coins for each winning game against the genetic agent. Challenge yourself by increasing the number of optional colors for more difficulty!
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+function closeInstructions(event) {
+    const modal = document.getElementById('instructionsModal');
+    // Close the modal if the background (outside the modal-content) is clicked
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+
 
 
 

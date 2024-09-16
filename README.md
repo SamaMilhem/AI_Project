@@ -1,25 +1,24 @@
-# Mastermind Game Solver - AI Project
 
-This repository contains a project to solve the Mastermind game using two AI approaches: **Q-Learning** and **Genetic Algorithm**. Additionally, the project includes an interactive **Mastermind GUI** implemented in HTML, allowing users to play the game against an AI agent or manually.
+# Mastermind Game Solver - AI Project 🧠🎮
 
-## Mastermind Game Overview
+## Mastermind Game Overview 🌟
 
 Mastermind is a classic code-breaking game where a player attempts to guess a secret code made up of colored pegs. After each guess, the player receives feedback:
-- **Black pegs** indicate correct colors in the correct positions.
-- **White pegs** indicate correct colors in the wrong positions.
+- **Black pegs** ⚫ indicate correct colors in the correct positions.
+- **White pegs** ⚪ indicate correct colors in the wrong positions.
 
 The goal is to guess the secret code within a limited number of attempts. In this project:
-- The **Q-Learning agent** learns through trial and error, exploring different solutions.
-- The **Genetic Algorithm** optimizes the solution by simulating natural selection, crossover, and mutation.
+- The **Q-Learning agent** 🤖 learns through trial and error, exploring different solutions.
+- The **Genetic Algorithm** 🧬 optimizes the solution by simulating natural selection, crossover, and mutation.
 
-## Project Components
+## Project Components 🚀
 
 1. **Q-Learning Algorithm**: A reinforcement learning agent that learns to solve the Mastermind game through exploration and exploitation.
 2. **Genetic Algorithm**: An evolutionary approach that optimizes the solution to the Mastermind game using natural selection principles.
-3. **Output Directory**: Contains plots, CSV files, and other data generated during the training of the algorithms.
-4. **Mastermind GUI**: HTML files to allow interactive play against a genetic algorithm-based AI or manually.
+3. **Output Directory**: Contains plots 📊, CSV files 📁, and other data generated during the training of the algorithms.
+4. **Mastermind GUI**: HTML files to allow interactive play against a genetic algorithm-based AI or manually, and now also includes a Q-Learning agent simulation.
 
-## Project Structure
+## Project Structure 📂
 
 - `Q_learning.py`: Python script implementing the Q-Learning algorithm for the Mastermind game.
 - `genetic_algorithm.py`: Python script implementing the Genetic Algorithm to solve the game.
@@ -28,17 +27,16 @@ The goal is to guess the secret code within a limited number of attempts. In thi
   - **CSV Files**: Data generated during the algorithm training, such as metrics for the number of guesses, time taken, and hyperparameter tuning.
 - `GUI_Mastermind/`: Directory containing HTML files for the GUI that can be run locally in a browser. This includes options to play the game manually or against the AI.
 
-## How to Run the Project
+## How to Run the Project 🏃‍♂️
 
 ### 1. Running the Q-Learning Algorithm
 You can run the Q-Learning algorithm by executing `Q_learning.py`. There are several configurations and simulations you can run:
 
-- To simulate games and evaluate the agent’s performance over 1000 games:
+- To simulate games and evaluate the agent's performance over 1000 games:
   ```python
   simulate_games(epsilon=EPSILON, num_games=1000, alpha=ALPHA, discount=DISCOUNT,
                  max_guesses=MAX_GUESSES, code_length=genetic_algorithm.DEFAULT_C0DE_LENGTH, num_colors=genetic_algorithm.DEFAULT_NUM_COLORS)
   ```
-
   This will print the average time taken for each game, the number of turns taken, and the total training time.
 
 - To find the best hyperparameter combination:
@@ -71,23 +69,30 @@ To run the Genetic Algorithm, execute `genetic_algorithm.py` with the following 
   ```
   The results will be saved as `fitness_weights_results.csv` in the `output/` directory and the best combination will be printed to the screen.
 
-  A 3D graph for performance across different color and position ranges can be generated as well:
+- A 3D graph for performance across different color and position ranges can be generated as well:
   ```python
   colors_vs_positions(color_range_min=6, color_range_max=14, code_length_min=4, code_length_max=8, num_games=100)
   ```
 
 ### 3. Using the Mastermind GUI
+
 You can play the Mastermind game using the GUI provided in the `GUI_Mastermind/` directory:
 
 1. Download the `GUI_Mastermind/` directory.
 2. Open `menu_page.html` in a web browser.
 
-From there, you can choose to:
-- Play the **classic game** (`manual.html`).
-- **Play against the AI** (`Genetic_game.html`) using a genetic algorithm-based agent.
+From there, you will have **three buttons** on the menu page, each representing a different game mode:
+- Play the **classic game** via `manual.html`.
+- **Play Against A Genetic Agent** via `Genetic_game.html` using a genetic algorithm-based agent.
+- Run a simulation of the **Q-Learning agent** via `RLgent.html`, where you can observe how the agent learns and guesses a secret code in real-time.
 
-### Output Directory
+Additionally, you will also find an **Instructions button** on the menu page, which you can click to view detailed instructions on how to play the Mastermind game.
+
+### Output Directory 📊
 
 The `output/` directory contains:
 - **Plots**: Performance metrics such as learning curves and the number of guesses over time, generated during algorithm execution.
 - **CSV Files**: Includes data such as algorithm performance, hyperparameter configurations, and other metrics for analysis.
+
+
+

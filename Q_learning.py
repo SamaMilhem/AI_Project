@@ -234,7 +234,6 @@ def evaluate_agent(agent, secret, code_length, max_guesses, num_colors):
     guess = agent.get_best_action()
     env = Environment(secret, code_length, num_colors)
     num_guesses = 1
-    print(agent.Q_values)
     while guess != env.secret and num_guesses < GUESSES_THRESHOLD:
         feedback = env.get_feedback(guess)
         agent.restrict_possible_states(guess, feedback)

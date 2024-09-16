@@ -141,7 +141,7 @@
     background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
     justify-content: center;
     align-items: center;
-    z-index: 100; /* Ensure it appears on top */
+    z-index: 100;
 }
 
 #gameResultModal .modal-content {
@@ -150,16 +150,16 @@
     border-radius: 10px;
     text-align: center;
     width: 80%;
-    max-width: 400px; /* Set maximum width */
-    margin: 0 auto; /* Center the modal on the screen */
-    position: relative; /* Make sure child elements like the close button are positioned relative to this */
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
 }
 
 
 #gameResultModal .modal-content h2 {
     font-size: 24px;
     margin-bottom: 10px;
-    color: black; /* Ensure the text color is black */
+    color: black;
 }
 
 #gameResultModal .modal-content p {
@@ -169,9 +169,9 @@
 
 #gameResultModal .modal-content .button-row {
     display: flex;
-    justify-content: center; /* Center the buttons */
-    gap: 20px; /* Space between buttons */
-    padding: 10px 0; /* Add padding at the top and bottom */
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 0;
 }
 
 #gameResultModal .modal-content button {
@@ -182,10 +182,10 @@
     color: white;
     font-weight: bold;
     cursor: pointer;
-    width: 140px; /* Equal width for both buttons */
-    max-width: 140px; /* Ensure max width is fixed */
+    width: 140px;
+    max-width: 140px;
     text-align: center;
-    margin: 0 10px; /* Add margin around the buttons */
+    margin: 0 10px;
 }
 
 #gameResultModal .modal-content button:hover {
@@ -205,18 +205,18 @@
     color: #000;
 }
 .notification {
-    background-color: rgba(255, 0, 0, 0.8); /* Red background */
-    color: white; /* White text color */
+    background-color: rgba(255, 0, 0, 0.8);
+    color: white;
     padding: 10px;
     border-radius: 5px;
-    margin-bottom: 15px; /* Add space below the notification */
+    margin-bottom: 15px;
     text-align: center;
-    width: 100%; /* Full width of the container */
+    width: 100%;
     box-sizing: border-box;
 }
 
 .notification p {
-    display: inline; /* Make the paragraph and button inline */
+    display: inline;
     margin-right: 10px;
 }
 
@@ -276,7 +276,6 @@
     let gameActive = false;
     let selectedColor = null;
     let currentGuess;
-    // let state={secretCode,currentGuess};
 
     // Q-Learning Agent
     class QLearningAgent {
@@ -291,11 +290,12 @@
 
         reset() {
             this.possibleStates = this.generateAllPossibleStates();
-            // console.log("reset",this.possibleStates);
         }
 
-        // Generate all possible states
         generateAllPossibleStates() {
+            /**
+             * Generate all possible states
+             */
             let states = [];
             for (let i = 0; i < Math.pow(colors.length, 4); i++) {
                 let state = i.toString(colors.length).padStart(4, '0');
@@ -317,38 +317,37 @@
         }
 
         randomAction() {
-             // Select a random state from the possible states array
-            // Return the random state
+             /**
+             * Select a random state from the possible states array and return it
+             */
             return this.possibleStates[Math.floor(Math.random() * this.possibleStates.length)];
         }
 
-       getBestAction() {
-    // Find the maximum Q-value among possible states, treating undefined/null as -Infinity
-    let maxValue = Math.max(...this.possibleStates.map(state => this.Q_values[state] != null ? this.Q_values[state] : -Infinity));
+        getBestAction() {
+            // Find the maximum Q-value among possible states, treating undefined/null as -Infinity
+            let maxValue = Math.max(...this.possibleStates.map(state => this.Q_values[state] != null ? this.Q_values[state] : -Infinity));
 
-    // Collect all states with the maximum Q-value
-    let bestActions = this.possibleStates.filter(state => this.Q_values[state] === maxValue);
+            // Collect all states with the maximum Q-value
+            let bestActions = this.possibleStates.filter(state => this.Q_values[state] === maxValue);
 
-    // If no valid Q-value is found (i.e., maxValue is still -Infinity), choose a random action
-    if (maxValue === -Infinity || bestActions.length === 0) {
-        return this.randomAction();
-    }
+            // If no valid Q-value is found (i.e., maxValue is still -Infinity), choose a random action
+            if (maxValue === -Infinity || bestActions.length === 0) {
+                return this.randomAction();
+            }
+            // Randomly select one of the best actions
+            return bestActions[Math.floor(Math.random() * bestActions.length)];
+        }
 
-    // Randomly select one of the best actions
-    return bestActions[Math.floor(Math.random() * bestActions.length)];
-}
-update(guess, reward) {
-    const bestNextValue = Math.max(...this.possibleStates.map(nextState => this.Q_values[nextState] || 0));
-    const tdTarget = reward + this.discount * bestNextValue;
-
-    // Initialize Q-value if it doesn't exist
-    if (this.Q_values[guess] === undefined) {
-        this.Q_values[guess] = 0;
-    }
-
-    // Update the Q-value using the Q-learning formula
-    this.Q_values[guess] += this.alpha * (tdTarget - this.Q_values[guess]);
-}
+        update(guess, reward) {
+            const bestNextValue = Math.max(...this.possibleStates.map(nextState => this.Q_values[nextState] || 0));
+            const tdTarget = reward + this.discount * bestNextValue;
+            // Initialize Q-value if it doesn't exist
+            if (this.Q_values[guess] === undefined) {
+                this.Q_values[guess] = 0;
+            }
+            // Update the Q-value using the Q-learning formula
+            this.Q_values[guess] += this.alpha * (tdTarget - this.Q_values[guess]);
+        }
 
         updatePossibleStates(guess, feedback) {
             this.possibleStates = this.possibleStates.filter(state =>
@@ -377,10 +376,10 @@ update(guess, reward) {
 
             return [hits, misses];
         }
+
         generateSecretCode() {
               return Array.from({length: 4}, () => Math.floor(Math.random() * colors.length)).join('');
         }
-
 
        train(n_episodes) {
            for (let episode = 0; episode < n_episodes; episode++) {
@@ -417,7 +416,6 @@ update(guess, reward) {
 
                 // console.log(`Secret code guessed in ${attempts} attempts!\n`);
             }
-           console.log(this.Q_values)
         }
 
     }
@@ -508,28 +506,28 @@ update(guess, reward) {
         }
     }
 
- function startGame() {
-    const notificationBox = document.getElementById('notification-box');
-    const notificationMessage = document.getElementById('notification-message');
-    const gameContainer = document.querySelector('.game-container');
+     function startGame() {
+        const notificationBox = document.getElementById('notification-box');
+        const notificationMessage = document.getElementById('notification-message');
+        const gameContainer = document.querySelector('.game-container');
 
-    // Check if the secret code has been fully set (no undefined values)
-    if (secretCode.includes(undefined)) {
-        // Show the notification box with the message
-        notificationMessage.textContent = 'Please set a complete secret code before starting the game!';
-        notificationBox.style.display = 'block';  // Show the notification box
+        // Check if the secret code has been fully set
+        if (secretCode.includes(undefined)) {
+            // Show the notification box with the message
+            notificationMessage.textContent = 'Please set a complete secret code before starting the game!';
+            notificationBox.style.display = 'block';  // Show the notification box
 
-        // Disable interaction by adding a class to the game container
-        gameContainer.classList.add('disabled-interaction');
+            // Disable interaction by adding a class to the game container
+            gameContainer.classList.add('disabled-interaction');
 
-        // Set timeout to hide the message after 3 seconds and re-enable interaction
-        setTimeout(() => {
-            notificationBox.style.display = 'none';  // Hide the notification box
-            gameContainer.classList.remove('disabled-interaction');  // Re-enable interaction
-        }, 1000);
+            // Set timeout to hide the message after 1 second and re-enable interaction
+            setTimeout(() => {
+                notificationBox.style.display = 'none';  // Hide the notification box
+                gameContainer.classList.remove('disabled-interaction');  // Re-enable interaction
+            }, 1000);
 
-        return;  // Stop the game from starting until the code is complete
-    }
+            return;  // Stop the game from starting until the code is complete
+        }
 
     // Hide the notification box if the code is complete
     notificationBox.style.display = 'none';
@@ -667,13 +665,13 @@ update(guess, reward) {
         window.location.href = 'menu_page.html'; // Replace with the correct menu page URL
     }
 
-      function restartGame() {
+    function restartGame() {
         document.getElementById('gameResultModal').style.display = 'none'; // Hide the result modal
         newGame(); // Start a new game
-      }
-      function closeModal() {
-    document.getElementById('gameResultModal').style.display = 'none';
-}
+    }
+    function closeModal() {
+        document.getElementById('gameResultModal').style.display = 'none';
+    }
 
 </script>
 </body>

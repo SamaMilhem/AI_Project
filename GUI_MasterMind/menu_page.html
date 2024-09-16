@@ -72,7 +72,7 @@
         display: flex;
         justify-content: space-between;
         margin-top: 1px;
-        font-family: Georgia, serif; /* Change font to Georgia */
+        font-family: Georgia, serif;
         font-size: 14px;
         color: #ffffff;
     }
@@ -137,7 +137,6 @@
             <button onclick="startGame('RLagent.html')">Q-Learning Agent</button>
             <button onclick="startGame('Genetic_game.html')">Play Against a Genetic Agent</button>
 
-
         </div>
     </div>
 
@@ -169,18 +168,14 @@
 </div>
 
 <script>
-function closeInstructions(event) {
-    const modal = document.getElementById('instructionsModal');
-    // Close the modal if the background (outside the modal-content) is clicked
-    if (event.target === modal) {
-        modal.style.display = 'none';
+    function closeInstructions(event) {
+        const modal = document.getElementById('instructionsModal');
+        // Close the modal if the background is clicked
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
     }
-}
-</script>
-
-
-
-
+    </script>
 
 <script>
 
@@ -191,21 +186,19 @@ function closeInstructions(event) {
         const colorCount = document.getElementById('color-range').value;
         window.location.href = `${mode}?colors=${colorCount}`;
     }
-       function showInstructions() {
-           /**
-            * Show the instructions modal
-            */
-            document.getElementById('instructionsModal').style.display = 'block';
-        }
+    function showInstructions() {
+       /**
+        * Show the instructions modal
+        */
+        document.getElementById('instructionsModal').style.display = 'block';
+    }
 
-        function closeInstructions() {
-            /**
-             * Close the instructions modal
-             */
-            document.getElementById('instructionsModal').style.display = 'none';
-        }
-
-
+    function closeInstructions() {
+        /**
+         * Close the instructions modal
+         */
+        document.getElementById('instructionsModal').style.display = 'none';
+    }
 
     // Close the modal when clicking outside of it
     window.onclick = function (event) {
